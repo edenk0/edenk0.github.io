@@ -45,7 +45,7 @@
     const ctx = canvas.getContext('2d');
     const scoreDisplay = document.getElementById('score');
 
-    const ballRadius = 20;
+    const ballRadius = 40;  // La taille de la balle (la tête de John Pork)
     const paddleHeight = 10;
     const paddleWidth = 100;
     let ballX = canvas.width / 2;
@@ -53,13 +53,11 @@
     let ballDX = 4;
     let ballDY = -4;
     let paddleX = (canvas.width - paddleWidth) / 2;
-    let rightPressed = false;
-    let leftPressed = false;
     let score = 0;
 
     // Image de la tête de John Pork
     const ballImage = new Image();
-    ballImage.src = 'johnpork-visage.jpg'
+    ballImage.src = 'johnpork-visage.jpg'; // Assure-toi que l'image est dans le même dossier que ce fichier HTML
 
     // Contrôler le mouvement de la raquette avec la souris
     document.addEventListener('mousemove', mouseMoveHandler, false);
@@ -90,4 +88,48 @@
 
     function collisionDetection() {
         // Collision avec les bords gauche et droit
-        if (ballX + ballDX > canvas.width - ballRadi
+        if (ballX + ballDX > canvas.width - ballRadius || ballX + ballDX < ballRadius) {
+            ballDX = -ballDX;
+        }
+
+        // Collision avec le bas (game over si la balle tombe)
+        if (ballY + ballDY > canvas.height - ballRadius) {
+            if (ballX > paddleX && ballX < paddleX + paddleWidth) {
+                ballDY = -ballDY;
+                score++; // Augmenter le score
+            } else {
+                // Game over
+                alert("Game Over! Final Score: " + score);
+                document.location.reload(); // Redémarre le jeu si la balle tombe
+            }
+        }
+
+        // Collision avec le haut
+        if (ballY + ballDY < ballRadius) {
+            ballDY = -ballDY;
+        }
+    }
+
+    function updateGame() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Effacer le canvas
+        drawBall();
+        drawPaddle();
+        drawScore();
+        collisionDetection();
+
+        // Mise à jour de la position de la balle
+        ballX += ballDX;
+        ballY += ballDY;
+
+        requestAnimationFrame(updateGame); // Appeler la fonction à chaque frame
+    }
+
+    // Commencer le jeu dès que l'image est chargée
+    ballImage.onload = () => {
+        updateGame();
+    };
+</script>
+
+</body>
+</html>
+
