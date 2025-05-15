@@ -50,8 +50,8 @@
     const paddleWidth = 100;
     let ballX = canvas.width / 2;
     let ballY = 30;  // La balle commence près du haut du canevas
-    let ballDX = 4;
-    let ballDY = 4;  // Vitesse de la balle
+    let ballDX = 4;   // Vitesse horizontale de la balle
+    let ballDY = 4;   // Vitesse verticale de la balle
     let paddleX = (canvas.width - paddleWidth) / 2;
     let score = 0;
 
@@ -89,13 +89,13 @@
     function collisionDetection() {
         // Collision avec les bords gauche et droit
         if (ballX + ballDX > canvas.width - ballRadius || ballX + ballDX < ballRadius) {
-            ballDX = -ballDX;
+            ballDX = -ballDX; // Rebondir horizontalement
         }
 
         // Collision avec le bas (game over si la balle tombe)
         if (ballY + ballDY > canvas.height - ballRadius) {
             if (ballX > paddleX && ballX < paddleX + paddleWidth) {
-                ballDY = -ballDY;
+                ballDY = -ballDY; // Rebondir verticalement
                 score++; // Augmenter le score
             } else {
                 // Game over
@@ -106,7 +106,7 @@
 
         // Collision avec le haut
         if (ballY + ballDY < ballRadius) {
-            ballDY = -ballDY;
+            ballDY = -ballDY; // Rebondir verticalement
         }
     }
 
@@ -117,7 +117,7 @@
         drawScore();
         collisionDetection();
 
-        // Mise à jour de la position de la balle
+        // Mise à jour de la position de la balle (mouvement horizontal et vertical)
         ballX += ballDX;
         ballY += ballDY;
 
@@ -129,6 +129,11 @@
         updateGame();
     };
 </script>
+
+</body>
+</html>
+
+
 
 </body>
 </html>
