@@ -20,4 +20,117 @@
             overflow: hidden;
         }
 
+        canvas {
+            background-color: black;
+            border: 1px solid white;
+        }
+
+        #score {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 30px;
+            color: red;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+<div id="score">Score: 0</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score');
+
+    const ballRadius = 40;  // La taille de la balle (la tête de John Pork)
+    const paddleHeight = 10;
+    const paddleWidth = 100;
+    let ballX = canvas.width / 2;
+    let ballY = 30;  // La balle commence près du haut du canevas
+    let ballDX = 4;
+    let ballDY = 4;  // Vitesse de la balle
+    let paddleX = (canvas.width - paddleWidth) / 2;
+    let score = 0;
+
+    // Image de la tête de John Pork
+    const ballImage = new Image();
+    ballImage.src = 'johnpork-visage.jpg'; // Assure-toi que l'image est dans le même dossier que ce fichier HTML
+
+    // Contrôler le mouvement de la raquette avec la souris
+    document.addEventListener('mousemove', mouseMoveHandler, false);
+
+    function mouseMoveHandler(e) {
+        const relativeX = e.clientX - canvas.offsetLeft;
+        if (relativeX > 0 && relativeX < canvas.width) {
+            paddleX = relativeX - paddleWidth / 2;
+        }
+    }
+
+    // Mettre à jour le jeu
+    function drawBall() {
+        ctx.drawImage(ballImage, ballX - ballRadius, ballY - ballRadius, ballRadius * 2, ballRadius * 2);
+    }
+
+    function drawPaddle() {
+        ctx.beginPath();
+        ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+        ctx.fillStyle = '#0095DD';
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    function drawScore() {
+        scoreDisplay.textContent = 'Score: ' + score;
+    }
+
+    function collisionDetection() {
+        // Collision avec les bords gauche et droit
+        if (ballX + ballDX > canvas.width - ballRadius || ballX + ballDX < ballRadius) {
+            ballDX = -ballDX;
+        }
+
+        // Collision avec le bas (game over si la balle tombe)
+        if (ballY + ballDY > canvas.height - ballRadius) {
+            if (ballX > paddleX && ballX < paddleX + paddleWidth) {
+                ballDY = -ballDY;
+                score++; // Augmenter le score
+            } else {
+                // Game over
+                alert("Game Over! Final Score: " + score);
+                document.location.reload(); // Redémarre le jeu si la balle tombe
+            }
+        }
+
+        // Collision avec le haut
+        if (ballY + ballDY < ballRadius) {
+            ballDY = -ballDY;
+        }
+    }
+
+    function updateGame() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Effacer le canvas
+        drawBall();
+        drawPaddle();
+        drawScore();
+        collisionDetection();
+
+        // Mise à jour de la position de la balle
+        ballX += ballDX;
+        ballY += ballDY;
+
+        requestAnimationFrame(updateGame); // Appeler la fonction à chaque frame
+    }
+
+    // Commencer le jeu dès que l'image est chargée
+    ballImage.onload = () => {
+        updateGame();
+    };
+</script>
+
+</body>
+</html>
+
 
