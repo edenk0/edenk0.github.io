@@ -62,45 +62,93 @@
       background-color: #F44336;
     }
 
-
     .message {
-        margin-top: 20px;
+      margin-top: 20px;
     }
 
     .button.white {
-     background-color: rgb(0, 0, 0);
-     color: black;
-     position: relative;
-     top: 170px;
-     right: 140px;
-     border: 3px solid white; 
+      background-color: rgb(0, 0, 0);
+      color: black;
+      position: relative;
+      top: 170px;
+      right: 140px;
+      border: 3px solid white; 
     }
 
-  
+    /* Nouveau bouton transparent en haut à gauche */
+    .info-button {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 2px solid white;
+      color: white;
+      font-size: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      background-color: transparent;
+      transition: transform 0.2s ease;
+    }
+
+    .info-button:hover {
+      transform: scale(1.1);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .button {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+      }
+
+      .button.white {
+        top: 150px;
+        right: 120px;
+      }
+
+      .image-principale {
+        max-width: 100%;
+        max-height: 100%;
+      }
+
+      .info-button {
+        width: 40px;
+        height: 40px;
+        font-size: 24px;
+      }
+    }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <img src="john-pork-is-calling.png" alt="Image d'accueil" class="image-principale">
+    <img src="john-pork-is-calling.png" alt="Image d'appel de John Pork" class="image-principale">
    
-    <a href="page2.html" class="button green">
+    <a href="page2.html" class="button green" aria-label="Appeler John Pork (option verte)">
         <span style="filter: brightness(10);">📞</span>
     </a>      
       
-   <a href="page3.html" class="button red">
+    <a href="page3.html" class="button red" aria-label="Appeler John Pork (option rouge)">
         <span style="filter: brightness(10);">📞</span>
     </a>
         
   </div>
 
   <div class="message">
-    <a class="button white">
+    <a class="button white" aria-label="Envoyer un message à John Pork">
         📩
     </a>
    </div>
+
+   <!-- Nouveau bouton transparent "i" -->
+   <a href="page5.html" class="info-button" aria-label="Plus d'information">
+      i
+   </a>
   
 </body>
 </html>
-
-
