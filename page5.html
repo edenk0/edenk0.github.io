@@ -33,7 +33,7 @@
   </style>
 </head>
 <body>
-  <h1>🐷 </h1>
+  <h1> 🐷 </h1>
   <div id="score">Joueur: 0 | John Pork: 0</div>
   <canvas id="pong" width="600" height="400"></canvas>
   <div id="pig">🐷</div>
@@ -63,7 +63,7 @@
     const pig = document.getElementById("pig");
 
     function updateScore() {
-      document.getElementById("score").textContent = Joueur: ${playerScore} | IA: ${aiScore};
+      document.getElementById("score").textContent = `Joueur: ${playerScore} | IA: ${aiScore}`;
     }
 
     function drawPaddles() {
@@ -115,7 +115,7 @@
       pig.style.top = canvas.offsetTop + ball.y - 12 + "px";
     }
 
-    function moveAIPaddle() {
+    function moveJohnPorkPaddle() {
       if (ball.y > rightPaddleY + paddleHeight / 2) {
         rightPaddleY += paddleSpeed;
       } else {
@@ -155,8 +155,8 @@
     draw();
   </script>
 </body>
-</html> 
 </html>
+
 
 
 
