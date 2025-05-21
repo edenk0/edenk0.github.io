@@ -34,7 +34,7 @@
 </head>
 <body>
   <h1> 🐷 </h1>
-  <div id="score">Joueur: 0 | John Pork: 0</div>
+  <div id="score">Joueur 1: 0 | Joueur 2: 0</div>
   <canvas id="pong" width="600" height="400"></canvas>
   <div id="pig">🐷</div>
 
@@ -48,10 +48,10 @@
     let leftPaddleY = canvas.height / 2 - paddleHeight / 2;
     let rightPaddleY = canvas.height / 2 - paddleHeight / 2;
 
-    let playerScore = 0;
-    let aiScore = 0;
+    let player1Score = 0;
+    let player2Score = 0;
 
-    const paddleSpeed = 4;
+    const paddleSpeed = 5;
 
     const ball = {
       x: canvas.width / 2,
@@ -62,8 +62,14 @@
 
     const pig = document.getElementById("pig");
 
+    let keys = {
+      ArrowUp: false,
+      ArrowDown: false
+    };
+
     function updateScore() {
-      document.getElementById("score").textContent = `Joueur: ${playerScore} | IA: ${aiScore}`;
+      document.getElementById("score").textContent =
+        `Joueur 1: ${player1Score} | Joueur 2: ${player2Score}`;
     }
 
     function drawPaddles() {
@@ -76,12 +82,12 @@
       ball.x += ball.speedX;
       ball.y += ball.speedY;
 
-      // Collision avec le haut ou bas
+      // Collision haut/bas
       if (ball.y <= 0 || ball.y >= canvas.height) {
         ball.speedY *= -1;
       }
 
-      // Collision avec la raquette gauche
+      // Collision raquette gauche
       if (
         ball.x <= paddleWidth &&
         ball.y >= leftPaddleY &&
@@ -91,7 +97,7 @@
         ball.x = paddleWidth + 1;
       }
 
-      // Collision avec la raquette droite (IA)
+      // Collision raquette droite
       if (
         ball.x >= canvas.width - paddleWidth &&
         ball.y >= rightPaddleY &&
@@ -101,61 +107,30 @@
         ball.x = canvas.width - paddleWidth - 1;
       }
 
-      // Marque un point
+      // Point
       if (ball.x < 0) {
-        aiScore++;
+        player2Score++;
         resetBall();
       } else if (ball.x > canvas.width) {
-        playerScore++;
+        player1Score++;
         resetBall();
       }
 
-      // Positionne l'emoji
+      // Positionner l'emoji 🐷
       pig.style.left = canvas.offsetLeft + ball.x - 12 + "px";
       pig.style.top = canvas.offsetTop + ball.y - 12 + "px";
     }
 
-    function moveJohnPorkPaddle() {
-      if (ball.y > rightPaddleY + paddleHeight / 2) {
-        rightPaddleY += paddleSpeed;
-      } else {
-        rightPaddleY -= paddleSpeed;
-      }
+    function moveRightPaddle() {
+      if (keys.ArrowUp) rightPaddleY -= paddleSpeed;
+      if (keys.ArrowDown) rightPaddleY += paddleSpeed;
 
-      // Empêche la raquette de sortir
+      // Empêcher de sortir
       rightPaddleY = Math.max(0, Math.min(canvas.height - paddleHeight, rightPaddleY));
     }
 
     function resetBall() {
       updateScore();
-      ball.x = canvas.width / 2;
-      ball.y = canvas.height / 2;
-      ball.speedX *= -1;
-    }
-
-    function draw() {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      drawPaddles();
-      moveBall();
-      moveAIPaddle();
-      requestAnimationFrame(draw);
-    }
-
-    // Contrôle souris
-    canvas.addEventListener("mousemove", (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const mouseY = e.clientY - rect.top;
-      leftPaddleY = mouseY - paddleHeight / 2;
-
-      // Limites du canvas
-      leftPaddleY = Math.max(0, Math.min(canvas.height - paddleHeight, leftPaddleY));
-    });
-
-    updateScore();
-    draw();
-  </script>
-</body>
-</html>
 
 
 
