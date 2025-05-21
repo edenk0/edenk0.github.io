@@ -10,34 +10,41 @@
       background-color: #111;
       font-family: Arial, sans-serif;
       color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
+
+    #score {
+      font-size: 24px;
+      margin: 10px;
+    }
+
     canvas {
       background-color: #222;
-      display: block;
-      margin: 0 auto;
+      border: 2px solid white;
     }
+
     #pig {
       font-size: 24px;
       position: absolute;
       pointer-events: none;
     }
-    #score {
-      text-align: center;
-      font-size: 24px;
-      margin-top: 10px;
-    }
   </style>
 </head>
 <body>
-  <h1 style="text-align:center;">Pong avec 🐷 John Pork</h1>
+  <h1>Pong avec 🐷 John Pork</h1>
   <div id="score">Joueur: 0 | IA: 0</div>
   <canvas id="pong" width="600" height="400"></canvas>
+  <div id="pig">🐷</div>
 
   <script>
     const canvas = document.getElementById("pong");
     const context = canvas.getContext("2d");
 
-    const paddleWidth = 10, paddleHeight = 100;
+    const paddleWidth = 10;
+    const paddleHeight = 100;
+
     let leftPaddleY = canvas.height / 2 - paddleHeight / 2;
     let rightPaddleY = canvas.height / 2 - paddleHeight / 2;
 
@@ -46,20 +53,110 @@
 
     const paddleSpeed = 4;
 
-    let ball = {
+    const ball = {
       x: canvas.width / 2,
       y: canvas.height / 2,
       speedX: 4,
       speedY: 4
     };
 
-    const pig = document.createElement("div");
-    pig.id = "pig";
-    pig.innerHTML = "🐷";
-    document.body.appendChild(pig);
+    const pig = document.getElementById("pig");
 
     function updateScore() {
-      document.getElementById("score").textContent = `Joueur:
+      document.getElementById("score").textContent = `Joueur: ${playerScore} | IA: ${aiScore}`;
+    }
+
+    function drawPaddles() {
+      context.fillStyle = "#fff";
+      context.fillRect(0, leftPaddleY, paddleWidth, paddleHeight);
+      context.fillRect(canvas.width - paddleWidth, rightPaddleY, paddleWidth, paddleHeight);
+    }
+
+    function moveBall() {
+      ball.x += ball.speedX;
+      ball.y += ball.speedY;
+
+      // Collision avec le haut ou bas
+      if (ball.y <= 0 || ball.y >= canvas.height) {
+        ball.speedY *= -1;
+      }
+
+      // Collision avec la raquette gauche
+      if (
+        ball.x <= paddleWidth &&
+        ball.y >= leftPaddleY &&
+        ball.y <= leftPaddleY + paddleHeight
+      ) {
+        ball.speedX *= -1;
+        ball.x = paddleWidth + 1;
+      }
+
+      // Collision avec la raquette droite (IA)
+      if (
+        ball.x >= canvas.width - paddleWidth &&
+        ball.y >= rightPaddleY &&
+        ball.y <= rightPaddleY + paddleHeight
+      ) {
+        ball.speedX *= -1;
+        ball.x = canvas.width - paddleWidth - 1;
+      }
+
+      // Marque un point
+      if (ball.x < 0) {
+        aiScore++;
+        resetBall();
+      } else if (ball.x > canvas.width) {
+        playerScore++;
+        resetBall();
+      }
+
+      // Positionne l'emoji
+      pig.style.left = canvas.offsetLeft + ball.x - 12 + "px";
+      pig.style.top = canvas.offsetTop + ball.y - 12 + "px";
+    }
+
+    function moveAIPaddle() {
+      if (ball.y > rightPaddleY + paddleHeight / 2) {
+        rightPaddleY += paddleSpeed;
+      } else {
+        rightPaddleY -= paddleSpeed;
+      }
+
+      // Empêche la raquette de sortir
+      rightPaddleY = Math.max(0, Math.min(canvas.height - paddleHeight, rightPaddleY));
+    }
+
+    function resetBall() {
+      updateScore();
+      ball.x = canvas.width / 2;
+      ball.y = canvas.height / 2;
+      ball.speedX *= -1;
+    }
+
+    function draw() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      drawPaddles();
+      moveBall();
+      moveAIPaddle();
+      requestAnimationFrame(draw);
+    }
+
+    // Contrôle souris
+    canvas.addEventListener("mousemove", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseY = e.clientY - rect.top;
+      leftPaddleY = mouseY - paddleHeight / 2;
+
+      // Limites du canvas
+      leftPaddleY = Math.max(0, Math.min(canvas.height - paddleHeight, leftPaddleY));
+    });
+
+    updateScore();
+    draw();
+  </script>
+</body>
+</html>
+
 
 
 
