@@ -1,200 +1,112 @@
-<!DOCTYPE html >
-< html >
-< tête >
-  < titre > Jeu HTML de base de Pong </ titre >
-  < meta  charset =" UTF-8 " >
-  < style >
-  html ,  corps {
-    hauteur :  100 % ;
-    marge :  0 ;
-  }
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Pong avec John Pork 🐷</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    canvas {
+      background-color: #222;
+      display: block;
+      margin: 0 auto;
+    }
+    #pig {
+      font-size: 24px;
+      position: absolute;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pong avec 🐷 John Pork</h1>
+  <canvas id="pong" width="600" height="400"></canvas>
+  <script>
+    const canvas = document.getElementById("pong");
+    const context = canvas.getContext("2d");
 
-  corps {
-    fond : noir;
-    affichage : flex;
-    align-items : centre ;
-    justifier-contenu : centre ;
-  }
-  </ style >
-</ tête >
-< corps >
-< largeur du canevas  =" 750 " hauteur =" 585 " id =" jeu " > </ canevas >
-< script >
-const  canvas  =  document . getElementById ( 'jeu' ) ;
- contexte  const =  canvas . getContext ( '2d' ) ;
- grille  constante =  15 ;
-const  paddleHeight  =  grille  *  5 ;  // 80
-const  maxPaddleY  =  canvas . height  -  grid  -  paddleHeight ;
+    const paddleWidth = 10, paddleHeight = 100;
+    let leftPaddleY = canvas.height / 2 - paddleHeight / 2;
+    let rightPaddleY = canvas.height / 2 - paddleHeight / 2;
 
-var  paddleSpeed  ​​=  6 ;
-var  ballSpeed  ​​=  5 ;
+    const paddleSpeed = 4;
 
-const  leftPaddle  =  {
-  // commencer au milieu du jeu sur le côté gauche
-  x : grille  *  2 ,
-  y : toile . hauteur  /  2  -  paddleHauteur  /  2 ,
-  largeur : grille ,
-  hauteur : pagaieHauteur ,
+    let ball = {
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      radius: 0, // Pas besoin d’un cercle, on utilisera un emoji
+      speedX: 3,
+      speedY: 3
+    };
 
-  // vitesse de la pagaie
-  dy : 0
-} ;
-const  rightPaddle  =  {
-  // commencer au milieu du jeu sur le côté droit
-  x : toile . largeur  -  grille  *  3 ,
-  y : toile . hauteur  /  2  -  paddleHauteur  /  2 ,
-  largeur : grille ,
-  hauteur : pagaieHauteur ,
+    const pig = document.createElement("div");
+    pig.id = "pig";
+    pig.innerHTML = "🐷";
+    document.body.appendChild(pig);
 
-  // vitesse de la pagaie
-  dy : 0
-} ;
-const  balle  =  {
-  // commencer au milieu du jeu
-  x : toile . largeur  /  2 ,
-  y : toile . hauteur  /  2 ,
-  largeur : grille ,
-  hauteur : grille ,
+    function drawPaddles() {
+      context.fillStyle = "#fff";
+      context.fillRect(0, leftPaddleY, paddleWidth, paddleHeight);
+      context.fillRect(canvas.width - paddleWidth, rightPaddleY, paddleWidth, paddleHeight);
+    }
 
-  // garder une trace du moment où il est nécessaire de réinitialiser la position de la balle
-  réinitialisation : faux ,
+    function moveBall() {
+      ball.x += ball.speedX;
+      ball.y += ball.speedY;
 
-  // vitesse de la balle (commencez à aller dans le coin supérieur droit)
-  dx : vitesse de la balle ,
-  dy : - vitesse de balle
-} ;
+      if (ball.y <= 0 || ball.y >= canvas.height) {
+        ball.speedY *= -1;
+      }
 
-// vérifier la collision entre deux objets à l'aide d'une boîte englobante alignée sur l'axe (AABB)
-// @voir https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
-fonction  entre en collision ( obj1 ,  obj2 )  {
-  renvoie  obj1 . x  <  obj2 . x  +  obj2 . width  &&
-         obj1 . x  +  obj1 . largeur  >  obj2 . x  &&
-         obj1 . y  <  obj2 . y  +  obj2 . hauteur  &&
-         obj1 . y  +  obj1 . hauteur  >  obj2 . y ;
-}
+      // Collisions avec les raquettes
+      if (ball.x <= paddleWidth && ball.y >= leftPaddleY && ball.y <= leftPaddleY + paddleHeight) {
+        ball.speedX *= -1;
+      } else if (ball.x >= canvas.width - paddleWidth && ball.y >= rightPaddleY && ball.y <= rightPaddleY + paddleHeight) {
+        ball.speedX *= -1;
+      }
 
-// boucle de jeu
- boucle de fonction ( )  {
-  requestAnimationFrame ( boucle ) ;
-  contexte . clearRect ( 0 , 0 , canvas . width , canvas . height ) ;
+      // Détection hors champ (simple reset)
+      if (ball.x < 0 || ball.x > canvas.width) {
+        ball.x = canvas.width / 2;
+        ball.y = canvas.height / 2;
+        ball.speedX *= -1;
+      }
 
-  // déplacer les palettes en fonction de leur vitesse
-  leftPaddle . y  +=  leftPaddle . dy ;
-  rightPaddle . y  +=  rightPaddle . dy ;
+      pig.style.left = (canvas.offsetLeft + ball.x - 12) + "px";
+      pig.style.top = (canvas.offsetTop + ball.y - 12) + "px";
+    }
 
-  // empêcher les pagaies de traverser les murs
-  si  ( leftPaddle . y  <  grille )  {
-    leftPaddle . y  =  grille ;
-  }
-  sinon  si  ( leftPaddle . y  >  maxPaddleY )  {
-    gauchePaddle . y  =  maxPaddleY ;
-  }
+    function moveRightPaddle() {
+      if (ball.y > rightPaddleY + paddleHeight / 2) {
+        rightPaddleY += paddleSpeed;
+      } else {
+        rightPaddleY -= paddleSpeed;
+      }
+    }
 
-  si  ( rightPaddle . y  <  grille )  {
-    rightPaddle . y  =  grille ;
-  }
-  sinon  si  ( rightPaddle . y  >  maxPaddleY )  {
-    droitePaddle . y  =  maxPaddleY ;
-  }
+    function draw() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      drawPaddles();
+      moveBall();
+      moveRightPaddle();
+      requestAnimationFrame(draw);
+    }
 
-  // dessiner des pagaies
-  contexte . fillStyle  =  'blanc' ;
-  contexte . fillRect ( leftPaddle . x ,  leftPaddle . y ,  leftPaddle . width ,  leftPaddle . height ) ;
-  contexte . fillRect ( rightPaddle . x ,  rightPaddle . y ,  rightPaddle . width ,  rightPaddle . height ) ;
+    // Contrôles joueur gauche (W et S)
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "w") leftPaddleY -= paddleSpeed * 2;
+      if (e.key === "s") leftPaddleY += paddleSpeed * 2;
+    });
 
-  // déplacer la balle par sa vitesse
-  balle . x  +=  balle . dx ;
-  balle . y  +=  balle . dy ;
+    draw();
+  </script>
+</body>
+</html>
 
-  // empêcher la balle de traverser les murs en modifiant sa vitesse
-  si  ( balle . y  <  grille )  {
-    boule . y  =  grille ;
-    balle . dy  *=  - 1 ;
-  }
-  sinon  si  ( ball.y + grille > canvas.height - grille ) {​​​​       
-    boule . y  =  toile . hauteur  -  grille  *  2 ;
-    balle . dy  *=  - 1 ;
-  }
-
-  // réinitialiser la balle si elle dépasse la raquette (mais seulement si nous ne l'avons pas déjà fait)
-  si  (  ( balle . x  <  0  ||  balle . x  >  toile . largeur )  &&  ! balle . réinitialisation )  {
-    balle . réinitialisation  =  vrai ;
-
-    // laissez un peu de temps au joueur pour récupérer avant de relancer la balle
-    setTimeout ( ( )  =>  {
-      balle . réinitialisation  =  faux ;
-      balle . x  =  toile . largeur  /  2 ;
-      boule . y  =  toile . hauteur  /  2 ;
-    } ,  400 ) ;
-  }
-
-  // vérifiez si la balle entre en collision avec la raquette. s'ils le font, changez la vitesse x
-  si  ( entre en collision ( balle ,  pagaie gauche ) )  {
-    balle . dx  *=  - 1 ;
-
-    // déplacez la balle à côté de la raquette sinon la collision se reproduira
-    // dans l'image suivante
-    balle . x  =  leftPaddle . x  +  leftPaddle . largeur ;
-  }
-  sinon  si  ( entre en collision ( balle ,  pagaie droite ) )  {
-    balle . dx  *=  - 1 ;
-
-    // déplacez la balle à côté de la raquette sinon la collision se reproduira
-    // dans l'image suivante
-    balle . x  =  rightPaddle . x  -  balle . largeur ;
-  }
-
-  // tirer la balle
-  contexte . fillRect ( balle . x ,  balle . y ,  balle . largeur ,  balle . hauteur ) ;
-
-  // dessiner des murs
-  contexte . fillStyle  =  'lightgrey' ;
-  contexte . fillRect ( 0 ,  0 ,  canvas . width ,  grid ) ;
-  contexte . fillRect ( 0 ,  canvas . height  -  grille ,  canvas . width ,  canvas . height ) ;
-
-  // tracez une ligne pointillée au milieu
-  pour  ( soit  i  =  grille ;  i  <  toile . hauteur  -  grille ;  i  +=  grille  *  2 )  {
-    contexte . fillRect ( canvas . width  /  2  -  grille  /  2 ,  i ,  grille ,  grille ) ;
-  }
-}
-
-// écouter les événements du clavier pour déplacer les palettes
-document . addEventListener ( 'keydown' ,  function ( e )  {
-
-  // touche flèche vers le haut
-  si  ( e . lequel  ===  38 )  {
-    rightPaddle . dy  =  - vitesse de la pagaie ;
-  }
-  // touche flèche vers le bas
-  sinon  si  ( e . lequel  ===  40 )  {
-    pagaie droite . dy  =  vitesse de la pagaie ;
-  }
-
-  // touche w
-  si  ( e . lequel  ===  87 )  {
-    pagaie gauche . dy  =  - vitesse de la pagaie ;
-  }
-  // une clé
-  sinon  si  ( e . lequel  ===  83 )  {
-    pagaie gauche . dy  =  vitesse de la pagaie ;
-  }
-} ) ;
-
-// écouter les événements du clavier pour arrêter la raquette si la touche est relâchée
-document . addEventListener ( 'keyup' ,  function ( e )  {
-  si  ( e . lequel  ===  38  ||  e . lequel  ===  40 )  {
-    droitePaddle . dy  =  0 ;
-  }
-
-  si  ( e . lequel  ===  83  ||  e . lequel  ===  87 )  {
-    pagaie gauche . dy  =  0 ;
-  }
-} ) ;
-
-// démarrer le jeu
-requestAnimationFrame ( boucle ) ;
-</ script >
-</ corps >
-</ html >
 
 
