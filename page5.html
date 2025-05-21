@@ -8,9 +8,8 @@
       margin: 0;
       overflow: hidden;
       background-color: #111;
-      color: white;
       font-family: Arial, sans-serif;
-      text-align: center;
+      color: white;
     }
     canvas {
       background-color: #222;
@@ -20,12 +19,20 @@
     #pig {
       font-size: 24px;
       position: absolute;
+      pointer-events: none;
+    }
+    #score {
+      text-align: center;
+      font-size: 24px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>Pong avec 🐷 John Pork</h1>
+  <h1 style="text-align:center;">Pong avec 🐷 John Pork</h1>
+  <div id="score">Joueur: 0 | IA: 0</div>
   <canvas id="pong" width="600" height="400"></canvas>
+
   <script>
     const canvas = document.getElementById("pong");
     const context = canvas.getContext("2d");
@@ -34,14 +41,16 @@
     let leftPaddleY = canvas.height / 2 - paddleHeight / 2;
     let rightPaddleY = canvas.height / 2 - paddleHeight / 2;
 
+    let playerScore = 0;
+    let aiScore = 0;
+
     const paddleSpeed = 4;
 
     let ball = {
       x: canvas.width / 2,
       y: canvas.height / 2,
-      radius: 0, // Pas besoin d’un cercle, on utilisera un emoji
-      speedX: 3,
-      speedY: 3
+      speedX: 4,
+      speedY: 4
     };
 
     const pig = document.createElement("div");
@@ -49,64 +58,8 @@
     pig.innerHTML = "🐷";
     document.body.appendChild(pig);
 
-    function drawPaddles() {
-      context.fillStyle = "#fff";
-      context.fillRect(0, leftPaddleY, paddleWidth, paddleHeight);
-      context.fillRect(canvas.width - paddleWidth, rightPaddleY, paddleWidth, paddleHeight);
-    }
-
-    function moveBall() {
-      ball.x += ball.speedX;
-      ball.y += ball.speedY;
-
-      if (ball.y <= 0 || ball.y >= canvas.height) {
-        ball.speedY *= -1;
-      }
-
-      // Collisions avec les raquettes
-      if (ball.x <= paddleWidth && ball.y >= leftPaddleY && ball.y <= leftPaddleY + paddleHeight) {
-        ball.speedX *= -1;
-      } else if (ball.x >= canvas.width - paddleWidth && ball.y >= rightPaddleY && ball.y <= rightPaddleY + paddleHeight) {
-        ball.speedX *= -1;
-      }
-
-      // Détection hors champ (simple reset)
-      if (ball.x < 0 || ball.x > canvas.width) {
-        ball.x = canvas.width / 2;
-        ball.y = canvas.height / 2;
-        ball.speedX *= -1;
-      }
-
-      pig.style.left = (canvas.offsetLeft + ball.x - 12) + "px";
-      pig.style.top = (canvas.offsetTop + ball.y - 12) + "px";
-    }
-
-    function moveRightPaddle() {
-      if (ball.y > rightPaddleY + paddleHeight / 2) {
-        rightPaddleY += paddleSpeed;
-      } else {
-        rightPaddleY -= paddleSpeed;
-      }
-    }
-
-    function draw() {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      drawPaddles();
-      moveBall();
-      moveRightPaddle();
-      requestAnimationFrame(draw);
-    }
-
-    // Contrôles joueur gauche (W et S)
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "w") leftPaddleY -= paddleSpeed * 2;
-      if (e.key === "s") leftPaddleY += paddleSpeed * 2;
-    });
-
-    draw();
-  </script>
-</body>
-</html>
+    function updateScore() {
+      document.getElementById("score").textContent = `Joueur:
 
 
 
